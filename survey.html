@@ -425,10 +425,6 @@ Submitted on ${new Date().toLocaleString()}`;
                                 <div style="font-size: 0.8em; margin-top: 5px; opacity: 0.9;">Opens email client</div>
                             </button>
                             
-                            <button onclick="openWhatsApp()" style="background: linear-gradient(45deg, #25d366, #128c7e); color: white; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-size: 1.1em; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
-                                💬 Send via WhatsApp
-                                <div style="font-size: 0.8em; margin-top: 5px; opacity: 0.9;">Mobile friendly</div>
-                            </button>
                             
                             <button onclick="openLinkedIn()" style="background: linear-gradient(45deg, #0077b5, #005885); color: white; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-size: 1.1em; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 119, 181, 0.3);">
                                 💼 Send via LinkedIn
@@ -445,8 +441,8 @@ Submitted on ${new Date().toLocaleString()}`;
                             <h4 style="color: #27ae60; margin-bottom: 10px;">🎯 Preferred Submission Methods:</h4>
                             <p style="color: #2c3e50; margin-bottom: 15px;">
                                 <strong>1st Choice:</strong> Copy to Clipboard or Download as File (no account needed)<br>
-                                <strong>2nd Choice:</strong> Send via Email (opens your email client)<br>
-                                <strong>3rd Choice:</strong> Send via LinkedIn Message (if you prefer social media)
+                                <strong>2nd Choice:</strong> Send via Email to pawel.wajdziak@nagarro.com<br>
+                                <strong>3rd Choice:</strong> Send via LinkedIn Message (professional networking)
                             </p>
                             <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px; margin-top: 10px;">
                                 <strong>💡 Tip:</strong> GitHub Issues are optional - only use if you have a GitHub account!
@@ -510,11 +506,6 @@ Submitted on ${new Date().toLocaleString()}`;
             window.open(emailUrl);
         }
         
-        function openWhatsApp() {
-            const message = `Hi! Here's my FLO25 Presentation Survey Response:\n\n${window.surveyResponse}`;
-            const whatsappUrl = `https://wa.me/1234567890?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
-        }
         
         function openLinkedIn() {
             const message = `Hi Pawel! Here's my FLO25 Presentation Survey Response:\n\n${window.surveyResponse}`;
