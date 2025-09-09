@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLO25 Presentation Survey - Token Theft & AI Defense</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+
+        .survey-form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .question {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .question h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .question label {
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .question label:hover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+
+        .question input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .question input[type="text"], .question textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .question textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 30px auto;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+
+        .rating {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .rating input[type="radio"] {
+            display: none;
+        }
+
+        .rating label {
+            font-size: 2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+        }
+
+        .rating label:hover,
+        .rating input:checked + label {
+            color: #f39c12;
+            transform: scale(1.2);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-group label:hover {
+            background: #e8f5e8;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .thank-you {
+            text-align: center;
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .thank-you h2 {
+            margin-bottom: 15px;
+        }
+
+        .links {
+            margin-top: 20px;
+        }
+
+        .links a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .links a:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 FLO25 Presentation Survey</h1>
+            <p>Live-Hacking Kubernetes API: Token Theft & AI Defense</p>
+            <p>Your feedback helps us improve future presentations!</p>
+        </div>
+
+        <form class="survey-form" id="surveyForm">
+            <div class="question">
+                <h3>1. Overall Rating ⭐</h3>
+                <div class="rating">
+                    <input type="radio" id="rating1" name="overall_rating" value="1">
+                    <label for="rating1">⭐</label>
+                    <input type="radio" id="rating2" name="overall_rating" value="2">
+                    <label for="rating2">⭐</label>
+                    <input type="radio" id="rating3" name="overall_rating" value="3">
+                    <label for="rating3">⭐</label>
+                    <input type="radio" id="rating4" name="overall_rating" value="4">
+                    <label for="rating4">⭐</label>
+                    <input type="radio" id="rating5" name="overall_rating" value="5">
+                    <label for="rating5">⭐</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <h3>2. What was most valuable? (Select all that apply)</h3>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="valuable" value="live_demo"> Live token theft demonstration</label>
+                    <label><input type="checkbox" name="valuable" value="ai_explanation"> AI defense mechanisms explanation</label>
+                    <label><input type="checkbox" name="valuable" value="statistics"> Real-world statistics and data</label>
+                    <label><input type="checkbox" name="valuable" value="technical_depth"> Technical depth and accuracy</label>
+                    <label><input type="checkbox" name="valuable" value="implementation"> Practical implementation insights</label>
+                    <label><input type="checkbox" name="valuable" value="best_practices"> Security best practices</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <h3>3. Technical Content Quality</h3>
+                <div class="rating">
+                    <input type="radio" id="tech1" name="technical_quality" value="1">
+                    <label for="tech1">⭐</label>
+                    <input type="radio" id="tech2" name="technical_quality" value="2">
+                    <label for="tech2">⭐</label>
+                    <input type="radio" id="tech3" name="technical_quality" value="3">
+                    <label for="tech3">⭐</label>
+                    <input type="radio" id="tech4" name="technical_quality" value="4">
+                    <label for="tech4">⭐</label>
+                    <input type="radio" id="tech5" name="technical_quality" value="5">
+                    <label for="tech5">⭐</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <h3>4. What could be improved?</h3>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="improvements" value="more_depth"> More technical depth</label>
+                    <label><input type="checkbox" name="improvements" value="visual_aids"> Better visual aids</label>
+                    <label><input type="checkbox" name="improvements" value="interactive"> More interactive elements</label>
+                    <label><input type="checkbox" name="improvements" value="qa_time"> Longer Q&A session</label>
+                    <label><input type="checkbox" name="improvements" value="examples"> More real-world examples</label>
+                    <label><input type="checkbox" name="improvements" value="pacing"> Better pacing</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <h3>5. Would you recommend this presentation?</h3>
+                <label><input type="radio" name="recommend" value="definitely"> ✅ Definitely - Highly recommend</label>
+                <label><input type="radio" name="recommend" value="yes"> 👍 Yes - Good presentation</label>
+                <label><input type="radio" name="recommend" value="maybe"> 🤷 Maybe - Depends on audience</label>
+                <label><input type="radio" name="recommend" value="no"> 👎 No - Not recommended</label>
+            </div>
+
+            <div class="question">
+                <h3>6. What's your role?</h3>
+                <label><input type="radio" name="role" value="security_engineer"> Security Engineer</label>
+                <label><input type="radio" name="role" value="devops_engineer"> DevOps Engineer</label>
+                <label><input type="radio" name="role" value="platform_engineer"> Platform Engineer</label>
+                <label><input type="radio" name="role" value="cloud_architect"> Cloud Architect</label>
+                <label><input type="radio" name="role" value="developer"> Developer</label>
+                <label><input type="radio" name="role" value="other"> Other: <input type="text" name="role_other" placeholder="Please specify"></label>
+            </div>
+
+            <div class="question">
+                <h3>7. Future topics you'd like to see?</h3>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="topics" value="advanced_k8s_security"> Advanced Kubernetes security patterns</label>
+                    <label><input type="checkbox" name="topics" value="ai_ml_cybersecurity"> AI/ML in cybersecurity</label>
+                    <label><input type="checkbox" name="topics" value="zero_trust"> Zero-trust architecture</label>
+                    <label><input type="checkbox" name="topics" value="container_runtime"> Container runtime security</label>
+                    <label><input type="checkbox" name="topics" value="network_security"> Network security in K8s</label>
+                    <label><input type="checkbox" name="topics" value="compliance"> Compliance and governance</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <h3>8. Additional comments or suggestions</h3>
+                <textarea name="comments" placeholder="Please share any additional thoughts, suggestions, or feedback..."></textarea>
+            </div>
+
+            <div class="question">
+                <h3>9. Contact Information (Optional)</h3>
+                <label>Name: <input type="text" name="name" placeholder="Your name"></label>
+                <label>Email: <input type="email" name="email" placeholder="your.email@example.com"></label>
+                <label>LinkedIn: <input type="url" name="linkedin" placeholder="https://linkedin.com/in/yourprofile"></label>
+                <label>Company: <input type="text" name="company" placeholder="Your company"></label>
+            </div>
+
+            <button type="submit" class="submit-btn">Submit Survey 🚀</button>
+        </form>
+
+        <div class="thank-you" id="thankYou">
+            <h2>🎉 Thank You!</h2>
+            <p>Your feedback has been submitted and will help us improve future presentations!</p>
+            <div class="links">
+                <a href="https://github.com/PawelWaj/FLO2025" target="_blank">🐙 GitHub Repository</a>
+                <a href="https://www.linkedin.com/in/pawel-wajdziak-346889229/" target="_blank">🔗 LinkedIn</a>
+                <a href="presentation.html">📊 Back to Presentation</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('surveyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Collect form data
+            const formData = new FormData(this);
+            const data = {};
+            
+            // Handle radio buttons
+            const radioGroups = ['overall_rating', 'technical_quality', 'recommend', 'role'];
+            radioGroups.forEach(group => {
+                const selected = document.querySelector(`input[name="${group}"]:checked`);
+                data[group] = selected ? selected.value : null;
+            });
+            
+            // Handle checkboxes
+            const checkboxGroups = ['valuable', 'improvements', 'topics'];
+            checkboxGroups.forEach(group => {
+                const checked = document.querySelectorAll(`input[name="${group}"]:checked`);
+                data[group] = Array.from(checked).map(cb => cb.value);
+            });
+            
+            // Handle text inputs
+            const textInputs = ['role_other', 'comments', 'name', 'email', 'linkedin', 'company'];
+            textInputs.forEach(input => {
+                data[input] = formData.get(input) || '';
+            });
+            
+            // Create GitHub issue content
+            const issueContent = createGitHubIssueContent(data);
+            
+            // Open GitHub issue creation
+            const githubUrl = `https://github.com/PawelWaj/FLO2025/issues/new?title=FLO25%20Survey%20Response&body=${encodeURIComponent(issueContent)}`;
+            window.open(githubUrl, '_blank');
+            
+            // Show thank you message
+            document.getElementById('surveyForm').style.display = 'none';
+            document.getElementById('thankYou').style.display = 'block';
+        });
+        
+        function createGitHubIssueContent(data) {
+            return `# 📝 FLO25 Presentation Survey Response
+
+## Overall Rating: ${data.overall_rating ? '⭐'.repeat(data.overall_rating) : 'Not provided'}
+
+## Most Valuable Aspects:
+${data.valuable ? data.valuable.map(item => `- ${item}`).join('\n') : 'None selected'}
+
+## Technical Quality: ${data.technical_quality ? '⭐'.repeat(data.technical_quality) : 'Not provided'}
+
+## Improvements Needed:
+${data.improvements ? data.improvements.map(item => `- ${item}`).join('\n') : 'None selected'}
+
+## Recommendation: ${data.recommend || 'Not provided'}
+
+## Role: ${data.role} ${data.role_other ? `(${data.role_other})` : ''}
+
+## Future Topics:
+${data.topics ? data.topics.map(item => `- ${item}`).join('\n') : 'None selected'}
+
+## Additional Comments:
+${data.comments || 'None provided'}
+
+## Contact Information:
+- Name: ${data.name || 'Not provided'}
+- Email: ${data.email || 'Not provided'}
+- LinkedIn: ${data.linkedin || 'Not provided'}
+- Company: ${data.company || 'Not provided'}
+
+---
+*Survey submitted on ${new Date().toLocaleString()}*
+`;
+        }
+    </script>
+</body>
+</html>
