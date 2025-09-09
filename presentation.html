@@ -730,6 +730,11 @@ $ kubectl --token=$STOLEN_TOKEN create clusterrole admin --verb=* --resource=*<b
             
             slides[currentSlide].classList.add('active');
             document.getElementById('current-slide').textContent = currentSlide + 1;
+            
+            // Regenerate QR code if we're on the survey slide (slide 13)
+            if (currentSlide === 12) { // 0-indexed, so slide 13 is index 12
+                setTimeout(generateQRCode, 100);
+            }
         }
 
         function nextSlide() {
@@ -782,14 +787,33 @@ $ kubectl --token=$STOLEN_TOKEN create clusterrole admin --verb=* --resource=*<b
             const surveyUrl = 'https://pawelwaj.github.io/FLO2025/survey.html';
             const qrContainer = document.getElementById('qrcode');
             
-            // Simple QR code using Google Charts API
+            // Clear any existing content
+            qrContainer.innerHTML = '';
+            
+            // Create QR code using qr-server.com API (more reliable)
             const qrImg = document.createElement('img');
-            qrImg.src = `https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=${encodeURIComponent(surveyUrl)}`;
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(surveyUrl)}`;
             qrImg.alt = 'Survey QR Code';
             qrImg.style.width = '200px';
             qrImg.style.height = '200px';
+            qrImg.style.border = '2px solid #4ecdc4';
+            qrImg.style.borderRadius = '10px';
+            
+            // Add error handling
+            qrImg.onerror = function() {
+                console.log('QR code failed to load, trying alternative...');
+                // Fallback to Google Charts API
+                qrImg.src = `https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=${encodeURIComponent(surveyUrl)}`;
+            };
             
             qrContainer.appendChild(qrImg);
+            
+            // Also add a text fallback
+            const fallbackText = document.createElement('p');
+            fallbackText.innerHTML = `<strong>Survey Link:</strong><br><a href="${surveyUrl}" target="_blank" style="color: #4ecdc4; word-break: break-all;">${surveyUrl}</a>`;
+            fallbackText.style.marginTop = '10px';
+            fallbackText.style.fontSize = '0.9em';
+            qrContainer.appendChild(fallbackText);
         }
 
         // Generate QR code when page loads
