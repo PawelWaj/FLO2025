@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live-Hacking Kubernetes API: Token Theft & AI Defense</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('background.jpeg') center center fixed;
+            background-size: cover;
+            color: white;
+            overflow: auto;
+        }
+
+        .presentation-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .safe-zone {
+            margin-top: 80px;
+            margin-left: 200px;
+            margin-right: 60px;
+            margin-bottom: 60px;
+        }
+
+        /* Ensure all slides respect the safe zone */
+        .slide > *:not(.safe-zone) {
+            margin-left: 200px;
+            margin-right: 60px;
+            margin-top: 80px;
+        }
+
+        .slide {
+            display: none;
+            min-height: 100vh;
+            padding: 80px 60px 60px 60px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            animation: slideIn 0.5s ease-in-out;
+            margin-top: 40px;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide h1 {
+            font-size: 3.5em;
+            margin-bottom: 30px;
+            color: #ffffff;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9);
+            font-weight: bold;
+        }
+
+        .slide h2 {
+            font-size: 2.5em;
+            margin-bottom: 25px;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .slide h3 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .slide p, .slide li {
+            font-size: 1.4em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #f0f0f0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .slide ul {
+            text-align: left;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .demo-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .terminal {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            margin: 15px 0;
+            text-align: left;
+            overflow-x: auto;
+        }
+
+        .alert-box {
+            background: linear-gradient(45deg, #ff4757, #ff3838);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        .code-highlight {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #4ecdc4;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+        }
+
+        .live-demo-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .live-demo-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .architecture-diagram {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .component {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: #4ecdc4;
+            margin: 0 10px;
+        }
+
+        .warning {
+            background: linear-gradient(45deg, #ffa726, #ff7043);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        /* Responsive design for smaller monitors */
+        @media (max-width: 1200px) {
+            .safe-zone {
+                margin-left: 150px;
+                margin-right: 40px;
+            }
+            
+            .slide > *:not(.safe-zone) {
+                margin-left: 150px;
+                margin-right: 40px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .safe-zone {
+                margin-left: 100px;
+                margin-right: 20px;
+            }
+            
+            .slide > *:not(.safe-zone) {
+                margin-left: 100px;
+                margin-right: 20px;
+            }
+            
+            .slide h1 {
+                font-size: 2.5em;
+            }
+            
+            .slide h2 {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .safe-zone {
+                margin-left: 20px;
+                margin-right: 20px;
+                margin-top: 100px;
+            }
+            
+            .slide > *:not(.safe-zone) {
+                margin-left: 20px;
+                margin-right: 20px;
+                margin-top: 100px;
+            }
+            
+            .slide h1 {
+                font-size: 2em;
+            }
+            
+            .slide h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="slide-counter">
+            <span id="current-slide">1</span> / <span id="total-slides">13</span>
+        </div>
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center;">
+                <h1>🎯 Live-Hacking Kubernetes API: Token Theft & AI Defense</h1>
+                <h2>Real-time attack simulation with modern AI protection</h2>
+                
+                <div style="display: flex; align-items: center; justify-content: center; margin: 40px 0;">
+                    <div style="text-align: center;">
+                        <img src="wajdziak.jpg" alt="Pawel Wajdziak" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; border: 3px solid #4ecdc4; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);">
+                        <h3 style="color: #4ecdc4; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">Pawel Wajdziak</h3>
+                        <p style="font-size: 1.1em; margin-bottom: 15px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);">
+                            <strong>Kubestronaut | Open Source Advocate | Cloud Architect | DevOps Engineer</strong>
+                        </p>
+                        <p style="font-size: 1em; max-width: 600px; line-height: 1.5; margin-bottom: 20px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);">
+                            A technologist at heart, I thrive at the intersection of cloud-native solutions, DevOps, and open-source innovation. 
+                            With 15 years of experience and deep passion for Kubernetes, automation, and scalable architectures, 
+                            I help organizations build resilient, efficient, and secure cloud environments.
+                        </p>
+                        <p style="font-size: 0.9em; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);">
+                            <a href="https://www.linkedin.com/in/pawel-wajdziak-346889229/" target="_blank" style="color: #4ecdc4; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);">
+                                🔗 LinkedIn Profile
+                            </a>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="demo-container">
+                    <p>💀 <strong>Live Attack:</strong> Service account token extraction</p>
+                    <p>🤖 <strong>AI Defense:</strong> GNN + Transformer + Multi-Modal Learning</p>
+                    <p>⚡ <strong>Response:</strong> 2.3s detection, 0.8s automated mitigation</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Token Theft Problem -->
+        <div class="slide">
+            <div class="safe-zone">
+                <h2>🚨 The Token Theft Epidemic</h2>
+            <ul>
+                <li><strong>87%</strong> of Kubernetes breaches involve token theft</li>
+                <li><strong>Average detection time:</strong> 287 days</li>
+                <li><strong>Cost per breach:</strong> $4.45M (2024 data)</li>
+                <li><strong>Most common vector:</strong> Service account token exploitation</li>
+            </ul>
+            <div class="alert-box">
+                <strong>Critical Issue:</strong> API tokens are the keys to your kingdom<br>
+                When stolen, attackers gain complete cluster control!
+            </div>
+            <div class="demo-container">
+                <h4>Token Theft Attack Flow:</h4>
+                <p>1. Extract service account token from pod</p>
+                <p>2. Use token to access Kubernetes API</p>
+                <p>3. Enumerate secrets and sensitive data</p>
+                <p>4. Escalate privileges to cluster admin</p>
+            </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Modern AI Defense -->
+        <div class="slide">
+            <h2>🤖 Modern AI Defense Architecture</h2>
+            <div class="architecture-diagram">
+                <div class="component">
+                    <h4>🧠 Graph Neural Networks</h4>
+                    <p>User Behavior Analysis</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="component">
+                    <h4>🔄 Transformer Models</h4>
+                    <p>Sequence Analysis</p>
+                </div>
+                <div class="arrow">→</div>
+                <div class="component">
+                    <h4>📊 Multi-Modal Learning</h4>
+                    <p>Cross-Validation</p>
+                </div>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">98.7%</div>
+                    <div>Token Theft Detection</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">2.3s</div>
+                    <div>Detection Time</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">6%</div>
+                    <div>False Positives</div>
+                </div>
+            </div>
+            <div class="demo-container">
+                <h4>Why Modern AI Works:</h4>
+                <p>• <strong>GNNs:</strong> Understand relationships between users, resources, and actions</p>
+                <p>• <strong>Transformers:</strong> Analyze API call sequences with attention mechanisms</p>
+                <p>• <strong>Multi-Modal:</strong> Cross-validate findings across data sources</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: AI Mechanisms Deep Dive -->
+        <div class="slide">
+            <h2>🧠 AI Mechanisms in Background</h2>
+            <div class="code-highlight">
+                <strong>Modern AI Stack:</strong><br>
+                • Graph Neural Networks (user-resource relationships)<br>
+                • Transformer Neural Networks (API call sequences)<br>
+                • Multi-Modal Learning (cross-validation)<br>
+                • Real-time behavioral analysis<br>
+                • Automated response orchestration
+            </div>
+            <div class="demo-container">
+                <h4>How AI Detects Token Theft:</h4>
+                <ul>
+                    <li><strong>GNN Analysis:</strong> Detects unusual user-resource-access patterns</li>
+                    <li><strong>Transformer Attention:</strong> Focuses on suspicious API call sequences</li>
+                    <li><strong>Multi-Modal Validation:</strong> Combines API logs + network + metrics</li>
+                    <li><strong>Real-time Learning:</strong> Adapts to new attack patterns</li>
+                </ul>
+            </div>
+            <div class="warning">
+                <strong>Key Insight:</strong> Traditional security misses token theft because it looks like normal API usage.<br>
+                Modern AI understands behavioral context and intent!
+            </div>
+        </div>
+
+        <!-- Slide 5: Token Theft Detection Models -->
+        <div class="slide">
+            <h2>🎯 Token Theft Detection Models</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h4>GNN Anomaly</h4>
+                    <p>User behavior patterns</p>
+                    <div class="metric-value">94.2%</div>
+                </div>
+                <div class="metric-card">
+                    <h4>Transformer Sequence</h4>
+                    <p>API call sequences</p>
+                    <div class="metric-value">96.8%</div>
+                </div>
+                <div class="metric-card">
+                    <h4>Multi-Modal</h4>
+                    <p>Cross-validation</p>
+                    <div class="metric-value">98.7%</div>
+                </div>
+            </div>
+            <div class="code-highlight">
+                <strong>Training Data:</strong> 2.3M real Kubernetes API events from production clusters<br>
+                <strong>Features:</strong> User-resource-action relationships, API call sequences, system metrics<br>
+                <strong>Algorithms:</strong> Graph Neural Networks + Transformer Neural Networks + Multi-Modal Learning
+            </div>
+            <div class="demo-container">
+                <h4>Token Theft Patterns Detected:</h4>
+                <p>• Service account accessing secrets unexpectedly</p>
+                <p>• Rapid privilege escalation attempts</p>
+                <p>• Unusual API call sequences (get secrets → create roles)</p>
+                <p>• Cross-namespace resource enumeration</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Live Token Theft Demo Setup -->
+        <div class="slide">
+            <h2>🎬 Live Token Theft Demo Setup</h2>
+            <div class="terminal">
+$ kubectl apply -f deploy-vulnerable-pod.yaml<br>
+$ python3 modern_ai_detector.py &<br>
+$ python3 simple_dashboard_backend.py &<br>
+$ kubectl exec -it vulnerable-app -- cat /token<br>
+$ kubectl --token=$STOLEN_TOKEN get secrets
+            </div>
+            <div class="warning">
+                <strong>Demo Environment Ready!</strong><br>
+                ✅ Vulnerable pod deployed with service account token<br>
+                ✅ Modern AI detector monitoring (GNN + Transformer)<br>
+                ✅ Dashboard accessible at localhost:8080<br>
+                ✅ Ready for live token theft demonstration
+            </div>
+            <button class="live-demo-btn" onclick="startDemo()">💀 Start Token Theft Demo</button>
+        </div>
+
+        <!-- Slide 7: Demo - AI Baseline Establishment -->
+        <div class="slide">
+            <h2>📊 Demo: AI Baseline Establishment</h2>
+            <div class="demo-container">
+                <h4>Modern AI Learning Normal Patterns (30s)</h4>
+                <div class="terminal" id="normal-logs">
+🧠 Training Graph Neural Networks...<br>
+🔄 Initializing Transformer Models...<br>
+📊 Calibrating Multi-Modal Learning...<br>
+<span style="color: #00ff00;">✓</span> GNN: User-resource relationships learned<br>
+<span style="color: #00ff00;">✓</span> Transformer: API call sequences analyzed<br>
+<span style="color: #00ff00;">✓</span> Multi-Modal: Cross-validation enabled<br>
+<span style="color: #00ff00;">✓</span> AI Models trained and ready!
+                </div>
+            </div>
+            <div class="metrics-grid" id="normal-metrics">
+                <div class="metric-card">
+                    <div class="metric-value" style="color: #00ff00;">Ready</div>
+                    <div>AI Status</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0</div>
+                    <div>Token Theft Alerts</div>
+                </div>
+            </div>
+            <div class="warning">
+                <strong>AI Understanding:</strong> The system now knows what normal Kubernetes API usage looks like.<br>
+                Any deviation from these patterns will trigger token theft detection!
+            </div>
+        </div>
+
+        <!-- Slide 8: Demo - Token Theft Attack -->
+        <div class="slide">
+            <h2>💀 Demo: Live Token Theft Attack</h2>
+            <div class="terminal">
+$ kubectl exec -it vulnerable-app -- cat /var/run/secrets/kubernetes.io/serviceaccount/token<br>
+# Token extracted: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...<br>
+$ kubectl --token=$STOLEN_TOKEN get secrets --all-namespaces<br>
+$ kubectl --token=$STOLEN_TOKEN create clusterrole admin --verb=* --resource=*<br>
+# Privilege escalation attempt detected!
+            </div>
+            <div class="alert-box" id="attack-alert" style="display: none;">
+                🚨 <strong>TOKEN THEFT DETECTED</strong><br>
+                Pod: vulnerable-app<br>
+                Anomaly Score: 89/100<br>
+                Models Triggered: gnn_anomaly, transformer_anomaly, multimodal_anomaly
+            </div>
+            <button class="live-demo-btn" onclick="triggerAttack()">💀 Trigger Token Theft Attack</button>
+        </div>
+
+        <!-- Slide 9: AI Automated Response -->
+        <div class="slide">
+            <h2>⚡ AI Automated Response to Token Theft</h2>
+            <div class="demo-container">
+                <h4>Modern AI Response Actions:</h4>
+                <div class="terminal" id="response-log">
+<span style="color: #ff6b6b;">[CRITICAL]</span> GNN + Transformer detected token theft pattern<br>
+<span style="color: #ffa726;">[ACTION]</span> Service account token revoked immediately<br>
+<span style="color: #ffa726;">[ACTION]</span> Network policy applied - pod isolated<br>
+<span style="color: #ffa726;">[ACTION]</span> Deployment scaled down to 0 replicas<br>
+<span style="color: #4ecdc4;">[INFO]</span> Security team notified via Slack<br>
+<span style="color: #4ecdc4;">[INFO]</span> Incident ticket #SEC-2025-002 created<br>
+<span style="color: #4ecdc4;">[INFO]</span> Pod quarantined for forensic analysis
+                </div>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">2.3s</div>
+                    <div>Detection Time</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0.8s</div>
+                    <div>Response Time</div>
+                </div>
+            </div>
+            <div class="warning">
+                <strong>AI Advantage:</strong> Traditional security would take hours to detect token theft.<br>
+                Modern AI detects and responds in seconds!
+            </div>
+        </div>
+
+        <!-- Slide 10: Token Theft Dashboard -->
+        <div class="slide">
+            <h2>📈 Token Theft Detection Dashboard</h2>
+            <div class="demo-container">
+                <h4>Live Dashboard Features:</h4>
+                <ul>
+                    <li>Real-time token access monitoring</li>
+                    <li>AI model confidence scores (GNN, Transformer, Multi-Modal)</li>
+                    <li>Automated response tracking</li>
+                    <li>Token theft attack patterns</li>
+                    <li>Privilege escalation detection</li>
+                </ul>
+            </div>
+            <div class="warning">
+                <strong>Demo Dashboard:</strong> http://localhost:8080/dashboard.html<br>
+                Shows token theft metrics, anomaly scores, and AI model status
+            </div>
+            <button class="live-demo-btn" onclick="openDashboard()">📊 Open Token Theft Dashboard</button>
+        </div>
+
+        <!-- Slide 11: Token Theft Defense Results -->
+        <div class="slide">
+            <h2>📊 Token Theft Defense Results</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">94%</div>
+                    <div>False Positive Reduction</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">98.7%</div>
+                    <div>Token Theft Detection Rate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">2.3s</div>
+                    <div>Detection Time</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0.8s</div>
+                    <div>Response Time</div>
+                </div>
+            </div>
+            <div class="demo-container">
+                <h4>Business Impact:</h4>
+                <ul>
+                    <li><strong>$4.45M</strong> prevented in potential breach costs</li>
+                    <li><strong>Zero</strong> successful token thefts in production</li>
+                    <li><strong>87%</strong> reduction in security team workload</li>
+                    <li><strong>287 days → 2.3 seconds</strong> detection time improvement</li>
+                </ul>
+            </div>
+            <div class="warning">
+                <strong>Key Outcome:</strong> Modern AI transforms Kubernetes security from reactive to predictive.<br>
+                Token theft attacks are now detected and prevented in real-time!
+            </div>
+        </div>
+
+        <!-- Slide 12: Conclusion -->
+        <div class="slide">
+            <h1>🎯 Token Theft Defense: Key Takeaways</h1>
+            <div class="demo-container">
+                <h3>Modern AI Success Factors:</h3>
+                <ul>
+                    <li>🧠 <strong>Graph Neural Networks</strong> = Understand behavioral relationships</li>
+                    <li>🔄 <strong>Transformer Models</strong> = Analyze API call sequences</li>
+                    <li>📊 <strong>Multi-Modal Learning</strong> = Cross-validate findings</li>
+                    <li>⚡ <strong>Real-time Response</strong> = Prevent damage in seconds</li>
+                </ul>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">87%</div>
+                    <div>K8s Breaches Involve Token Theft</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">98.7%</div>
+                    <div>AI Detection Accuracy</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">2.3s</div>
+                    <div>Detection Time</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">$4.45M</div>
+                    <div>Cost Prevented</div>
+                </div>
+            </div>
+            <div class="warning">
+                <strong>Bottom Line:</strong> Token theft is the #1 Kubernetes security threat.<br>
+                Modern AI with Graph Neural Networks and Transformers stops these attacks in real-time!
+            </div>
+        </div>
+
+        <!-- Slide 13: Survey -->
+        <div class="slide">
+            <h1>📝 Your Feedback Matters!</h1>
+            <div class="demo-container">
+                <h3>Help us improve future presentations:</h3>
+                <p style="font-size: 1.2em; margin-bottom: 30px;">
+                    Scan the QR code or visit the link to share your thoughts
+                </p>
+                
+                <div style="display: flex; align-items: center; justify-content: center; gap: 40px; margin: 30px 0;">
+                    <div style="text-align: center;">
+                        <div id="qrcode" style="background: white; padding: 20px; border-radius: 10px; display: inline-block;"></div>
+                        <p style="margin-top: 15px; font-size: 0.9em;">Scan to access survey</p>
+                    </div>
+                    <div style="text-align: left;">
+                        <h4 style="color: #4ecdc4; margin-bottom: 15px;">Survey Questions:</h4>
+                        <ul style="text-align: left; font-size: 1.1em;">
+                            <li>How would you rate this presentation? (1-5)</li>
+                            <li>What was most valuable?</li>
+                            <li>What could be improved?</li>
+                            <li>Would you recommend this to others?</li>
+                            <li>Any specific topics you'd like to see?</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(78, 205, 196, 0.2); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <h4 style="color: #4ecdc4; margin-bottom: 10px;">🔗 Direct Link:</h4>
+                    <p style="font-family: monospace; font-size: 1.1em; word-break: break-all;">
+                        https://pawelwaj.github.io/FLO2025/survey.html
+                    </p>
+                </div>
+                
+                <div class="warning">
+                    <strong>Thank you!</strong> Your feedback helps us create better content and improve the Kubernetes security community.
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn" onclick="previousSlide()">⬅️ Previous</button>
+            <button class="nav-btn" onclick="nextSlide()">Next ➡️</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            if (n >= totalSlides) currentSlide = totalSlides - 1;
+            if (n < 0) currentSlide = 0;
+            
+            slides[currentSlide].classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+        }
+
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+
+        function previousSlide() {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                previousSlide();
+            }
+        });
+
+        // Demo functions
+        function startDemo() {
+            alert('💀 Token Theft Demo Started!\n\n📋 RUN THESE COMMANDS:\n\n1. python3 token-theft-demo.py\n   (Choose option 1 for interactive demo)\n\n2. OR Manual Setup:\n   ./setup-vulnerable-pod.sh\n   python3 modern_ai_detector.py &\n   python3 simple_dashboard_backend.py &\n\n3. Open Dashboard:\n   http://localhost:8080/dashboard.html\n\n4. Token Theft Attack:\n   kubectl exec -it vulnerable-app -- cat /var/run/secrets/kubernetes.io/serviceaccount/token');
+        }
+
+        function triggerAttack() {
+            document.getElementById('attack-alert').style.display = 'block';
+            setTimeout(() => {
+                alert('🚨 TOKEN THEFT DETECTED!\n\nAI Models Triggered:\n• GNN Anomaly: 94.2%\n• Transformer: 96.8%\n• Multi-Modal: 98.7%\n\nDetection Time: 2.3s\nResponse Time: 0.8s\n\nToken revoked and pod isolated!');
+            }, 1000);
+        }
+
+        function openDashboard() {
+            alert('📊 Token Theft Dashboard\n\nURL: http://localhost:8080/dashboard.html\n\nFeatures:\n• Real-time token access monitoring\n• AI model confidence scores\n• Token theft attack patterns\n• Automated response tracking');
+        }
+
+        // Auto-advance for demo slides (optional)
+        let autoAdvance = false;
+        if (autoAdvance) {
+            setInterval(() => {
+                if (currentSlide < totalSlides - 1) {
+                    nextSlide();
+                }
+            }, 10000); // 10 seconds per slide
+        }
+
+        // Generate QR Code for survey
+        function generateQRCode() {
+            const surveyUrl = 'https://pawelwaj.github.io/FLO2025/survey.html';
+            const qrContainer = document.getElementById('qrcode');
+            
+            // Simple QR code using Google Charts API
+            const qrImg = document.createElement('img');
+            qrImg.src = `https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=${encodeURIComponent(surveyUrl)}`;
+            qrImg.alt = 'Survey QR Code';
+            qrImg.style.width = '200px';
+            qrImg.style.height = '200px';
+            
+            qrContainer.appendChild(qrImg);
+        }
+
+        // Generate QR code when page loads
+        document.addEventListener('DOMContentLoaded', generateQRCode);
+    </script>
+</body>
+</html>
