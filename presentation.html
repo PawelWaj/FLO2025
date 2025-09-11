@@ -315,7 +315,7 @@
 <body>
     <div class="presentation-container">
         <div class="slide-counter">
-            <span id="current-slide">1</span> / <span id="total-slides">13</span>
+            <span id="current-slide">1</span> / <span id="total-slides">14</span>
         </div>
 
         <!-- Slide 1: Title -->
@@ -376,7 +376,30 @@
             </div>
         </div>
 
-        <!-- Slide 3: Modern AI Defense -->
+        <!-- Slide 3: Session Information -->
+        <div class="slide">
+            <div class="safe-zone">
+                <h2>📅 Session Information</h2>
+                <div style="display: flex; align-items: center; justify-content: center; margin: 40px 0;">
+                    <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 15px; backdrop-filter: blur(10px);">
+                        <img src="session-qr.jpeg" alt="Session QR Code" style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);">
+                    </div>
+                </div>
+                <div class="demo-container">
+                    <h4>📋 Session Details:</h4>
+                    <p><strong>Date:</strong> September 19, 2025</p>
+                    <p><strong>Time:</strong> 2:00 PM – 2:45 PM</p>
+                    <p><strong>Location:</strong> Tech Sphere 4</p>
+                    <p><strong>Check-in:</strong> Opens at 1:45 PM, Closes at 2:15 PM</p>
+                </div>
+                <div class="warning">
+                    <strong>QR Code:</strong> Scan the code above to check into the session<br>
+                    <strong>Note:</strong> Check-in times are subject to change
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Modern AI Defense -->
         <div class="slide">
             <h2>🤖 Modern AI Defense Architecture</h2>
             <div class="architecture-diagram">
@@ -417,7 +440,7 @@
             </div>
         </div>
 
-        <!-- Slide 4: AI Mechanisms Deep Dive -->
+        <!-- Slide 5: AI Mechanisms Deep Dive -->
         <div class="slide">
             <h2>🧠 AI Mechanisms in Background</h2>
             <div class="code-highlight">
@@ -443,7 +466,7 @@
             </div>
         </div>
 
-        <!-- Slide 5: Token Theft Detection Models -->
+        <!-- Slide 6: Token Theft Detection Models -->
         <div class="slide">
             <h2>🎯 Token Theft Detection Models</h2>
             <div class="metrics-grid">
@@ -477,7 +500,7 @@
             </div>
         </div>
 
-        <!-- Slide 6: Live Token Theft Demo Setup -->
+        <!-- Slide 7: Live Token Theft Demo Setup -->
         <div class="slide">
             <h2>🎬 Live Token Theft Demo Setup</h2>
             <div class="terminal">
@@ -497,7 +520,7 @@ $ kubectl --token=$STOLEN_TOKEN get secrets
             <button class="live-demo-btn" onclick="startDemo()">💀 Start Token Theft Demo</button>
         </div>
 
-        <!-- Slide 7: Demo - AI Baseline Establishment -->
+        <!-- Slide 8: Demo - AI Baseline Establishment -->
         <div class="slide">
             <h2>📊 Demo: AI Baseline Establishment</h2>
             <div class="demo-container">
@@ -528,7 +551,7 @@ $ kubectl --token=$STOLEN_TOKEN get secrets
             </div>
         </div>
 
-        <!-- Slide 8: Demo - Token Theft Attack -->
+        <!-- Slide 9: Demo - Token Theft Attack -->
         <div class="slide">
             <h2>💀 Demo: Live Token Theft Attack</h2>
             <div class="terminal">
@@ -547,7 +570,7 @@ $ kubectl --token=$STOLEN_TOKEN create clusterrole admin --verb=* --resource=*<b
             <button class="live-demo-btn" onclick="triggerAttack()">💀 Trigger Token Theft Attack</button>
         </div>
 
-        <!-- Slide 9: AI Automated Response -->
+        <!-- Slide 10: AI Automated Response -->
         <div class="slide">
             <h2>⚡ AI Automated Response to Token Theft</h2>
             <div class="demo-container">
@@ -578,7 +601,7 @@ $ kubectl --token=$STOLEN_TOKEN create clusterrole admin --verb=* --resource=*<b
             </div>
         </div>
 
-        <!-- Slide 10: Token Theft Dashboard -->
+        <!-- Slide 11: Token Theft Dashboard -->
         <div class="slide">
             <h2>📈 Token Theft Detection Dashboard</h2>
             <div class="demo-container">
@@ -598,7 +621,7 @@ $ kubectl --token=$STOLEN_TOKEN create clusterrole admin --verb=* --resource=*<b
             <button class="live-demo-btn" onclick="openDashboard()">📊 Open Token Theft Dashboard</button>
         </div>
 
-        <!-- Slide 11: Token Theft Defense Results -->
+        <!-- Slide 12: Token Theft Defense Results -->
         <div class="slide">
             <h2>📊 Token Theft Defense Results</h2>
             <div class="metrics-grid">
@@ -634,7 +657,7 @@ $ kubectl --token=$STOLEN_TOKEN create clusterrole admin --verb=* --resource=*<b
             </div>
         </div>
 
-        <!-- Slide 12: Conclusion -->
+        <!-- Slide 13: Conclusion -->
         <div class="slide">
             <h1>🎯 Token Theft Defense: Key Takeaways</h1>
             <div class="demo-container">
@@ -670,7 +693,7 @@ $ kubectl --token=$STOLEN_TOKEN create clusterrole admin --verb=* --resource=*<b
             </div>
         </div>
 
-        <!-- Slide 13: Survey -->
+        <!-- Slide 14: Survey -->
         <div class="slide">
             <h1>📝 Your Feedback Matters!</h1>
             <div class="demo-container">
@@ -731,8 +754,8 @@ $ kubectl --token=$STOLEN_TOKEN create clusterrole admin --verb=* --resource=*<b
             slides[currentSlide].classList.add('active');
             document.getElementById('current-slide').textContent = currentSlide + 1;
             
-            // Regenerate QR code if we're on the survey slide (slide 13)
-            if (currentSlide === 12) { // 0-indexed, so slide 13 is index 12
+            // Regenerate QR code if we're on the survey slide (slide 14)
+            if (currentSlide === 13) { // 0-indexed, so slide 14 is index 13
                 setTimeout(generateQRCode, 100);
             }
         }
